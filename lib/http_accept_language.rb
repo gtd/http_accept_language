@@ -72,7 +72,14 @@ module HttpAcceptLanguage
     end
   end
 end
-if defined?(ActionDispatch::Request)
+
+if defined?(ActionController::Request) # Rails <= 2.x
+  ActionController::Request.send :include, HttpAcceptLanguage
+elsif defined?(ActionController::AbstractRequest)
+  ActionController::AbstractRequest.send :include, HttpAcceptLanguage
+elsif defined?(ActionController::CgiRequest)
+  ActionController::CgiRequest.send :include, HttpAcceptLanguage
+elsif defined?(ActionDispatch::Request) # Rails >= 3.x
   ActionDispatch::Request.send :include, HttpAcceptLanguage
 elsif defined?(ActionDispatch::AbstractRequest)
   ActionDispatch::AbstractRequest.send :include, HttpAcceptLanguage
