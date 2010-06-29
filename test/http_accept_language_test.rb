@@ -38,6 +38,11 @@ class HttpAcceptLanguageTest < Test::Unit::TestCase
     assert_equal 'en', request.compatible_language_from(%w{de en})
   end
 
+  def test_should_normalize_and_order_locales_correctly
+    assert_equal [ 'da', 'fr-FR', 'en-GB', 'en' ],
+                 request.parse_accept_language_string('da, en-gb;q=0.8, en;q=0.7, FR-FR;q=0.9')
+  end
+
   private
   def request
     @request ||= MockedCgiRequest.new

@@ -9,15 +9,7 @@ module HttpAcceptLanguage
   #   # => [ 'nl-NL', 'nl-BE', 'nl', 'en-US', 'en' ]
   #
   def user_preferred_languages
-    @user_preferred_languages ||= env['HTTP_ACCEPT_LANGUAGE'].split(/\s*,\s*/).collect do |l|
-      l += ';q=1.0' unless l =~ /;q=\d+\.\d+$/
-      l.split(';q=')
-    end.sort do |x,y|
-      raise "Not correctly formatted" unless x.first =~ /^[a-z\-]+$/i
-      y.last.to_f <=> x.last.to_f
-    end.collect do |l|
-      l.first.downcase.gsub(/-[a-z]+$/i) { |x| x.upcase }
-    end
+    @user_preferred_languages ||= parse_accept_language_string(env['HTTP_ACCEPT_LANGUAGE'])
   rescue # Just rescue anything if the browser messed up badly.
     []
   end
@@ -57,6 +49,27 @@ module HttpAcceptLanguage
         y.to_s =~ /^#{Regexp.escape(x.to_s)}(-|$)/
       end
     end.compact.first
+  end
+
+  # Parses the HTTP Accept-Language header as specified in RFC 2616, returning
+  # an array of strings representing the prioritized locales with capitalization
+  # normalized.
+  #
+  # Example:
+  #
+  #   request.parse_accept_language_string 'da, en-gb;q=0.8, en;q=0.7, FR-FR;q=0.9'
+  #   # => [ 'da', 'fr-FR', 'en-GB', 'en' ]
+  #
+  def parse_accept_language_string(string)
+    string.split(/\s*,\s*/).collect do |l|
+      l += ';q=1.0' unless l =~ /;q=\d+\.\d+$/
+      l.split(';q=')
+    end.sort do |x,y|
+      raise "Not correctly formatted" unless x.first =~ /^[a-z\-]+$/i
+      y.last.to_f <=> x.last.to_f
+    end.collect do |l|
+      l.first.downcase.gsub(/-[a-z]+$/i) { |x| x.upcase }
+    end
   end
 end
 if defined?(ActionDispatch::Request)
