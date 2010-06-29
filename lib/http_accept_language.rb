@@ -22,7 +22,12 @@ module HttpAcceptLanguage
     []
   end
 
-  # Sets the user languages preference, overiding the browser
+  # Sets the user languages preference, overiding the HTTP Accept-Language header.
+  # An array of strings is expected.
+  #
+  # Example:
+  #
+  #   request.user_preferred_languages = [ 'en-US', 'en-GB', 'en', 'fr-FR' ]
   #
   def user_preferred_languages=(languages)
     @user_preferred_languages = languages
@@ -53,7 +58,6 @@ module HttpAcceptLanguage
       end
     end.compact.first
   end
-
 end
 if defined?(ActionDispatch::Request)
   ActionDispatch::Request.send :include, HttpAcceptLanguage
