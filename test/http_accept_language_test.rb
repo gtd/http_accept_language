@@ -34,7 +34,7 @@ class HttpAcceptLanguageTest < Test::Unit::TestCase
   end
 
   def test_should_find_first_compatible_from_user_preferred
-    request.env['HTTP_ACCEPT_LANGUAGE'] = 'en-us,de-de'
+    request.env['HTTP_ACCEPT_LANGUAGE'] = 'en-us,en,de-de'
     assert_equal 'en', request.compatible_language_from(%w{de en})
   end
 
